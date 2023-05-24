@@ -1,60 +1,66 @@
 #include "shell.h"
 
 /**
-* numlen - counts number of digits in an integer
-* @n: number
-* Return: number of digits
-*/
+ * numlen - counts number of 0s in a tens power number
+ * @n: number
+ * Return: returns count of digits
+ */
 int numlen(int n)
 {
-int count = 0;
-while (n != 0)
-{
-n /= 10;
-count++;
-}
-return (count);
-}
+	int count = 0;
+	int num = n;
 
+	while (num > 9 || num < -9)
+	{
+		num /= 10;
+		count++;
+	}
+	return (count);
+}
 /**
-* int_to_string - converts an integer to a string
-* @number: integer
-* Return: the integer as a string, NULL if failed
-*/
+ * int_to_string - turns an int into a string
+ * @number: int
+ * Return: returns the int as a string. returns NULL if failed
+ */
+
 char *int_to_string(int number)
 {
-int digits = number;
-int is_negative = 0;
-int len, i, x;
-char *res;
+	int digits, tens, i = 0, t = 0, x;
+	char *res;
 
-if (number < 0)
-{
-is_negative = 1;
-digits = -digits;
-}
+	digits = number;
+	tens = 1;
 
-len = numlen(digits);
-res = malloc(sizeof(char) * (len + 2 + is_negative));
-if (res == NULL)
-{
-return (NULL);
-}
-
-i = 0;
-if (is_negative)
-{
-res[i] = '-';
-i++;
-}
-
-for (x = len - 1; x >= 0; x--)
-{
-res[i] = (digits / power_of_10(x)) + '0';
-i++;
-digits %= power_of_10(x);
-}
-
-res[i] = '\0';
-return (res);
+	if (number < 0)
+		t = 1;
+	res = malloc(sizeof(char) * (numlen(digits) + 2 + t));
+	if (res == NULL)
+		return (NULL);
+	if (number < 0)
+	{
+		res[i] = '-';
+		i++;
+	}
+	for (x = 0; digits > 9 || digits < -9; x++)
+	{
+		digits /= 10;
+		tens *= 10;
+	}
+	for (digits = number; x >= 0; x--)
+	{
+		if (digits < 0)
+		{
+			res[i] = (digits / tens) * -1 + '0';
+			i++;
+		}
+		else
+		{
+			res[i] = (digits / tens) + '0';
+			i++;
+		}
+		digits %= tens;
+		tens /= 10;
+	}
+	res[i] = '\0';
+	return (res);
 }

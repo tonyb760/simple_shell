@@ -1,73 +1,70 @@
 #include "shell.h"
 
 /**
- * count_tokens - returns number of tokens in a string based on delimiter
- * @str: string to count tokens from
- * @delim: delimiter character
+ * c_t_size - returns number of delim
+ * @str: user's command typed into shell
+ * @delm: delimeter (e.g. " ");
  * Return: number of tokens
  */
-int count_tokens(const char *str, char delim)
+int c_t_size(char *str, char delm)
 {
-	int count = 0;
-	int is_token = 0;
+	int i = 0, num_delm = 0;
 
-	while (*str != '\0')
+	while (str[i] != '\0')
 	{
-		if (*str == delim)
-			is_token = 0;
-		else if (is_token == 0)
+		if (str[i] == delm)
 		{
-			is_token = 1;
-			count++;
+			num_delm++;
 		}
-		str++;
-	}
-
-	return (count);
-}
-
-/**
- * tokenize_string - tokenizes a string using a delimiter
- * @str: string to tokenize
- * @delim: delimiter string
- * Return: array of tokens
- */
-char **tokenize_string(const char *str, const char *delim)
-{
-	int token_count = count_tokens(str, delim[0]);
-	char **tokens = malloc((token_count + 1) * sizeof(char *));
-	char *token;
-	char *copy;
-	char *save_ptr;
-	int i = 0;
-
-	if (tokens == NULL)
-		return (NULL);
-
-	copy = strdup(str);
-	if (copy == NULL)
-	{
-		free(tokens);
-		return (NULL);
-	}
-
-	token = strtok_r(copy, delim, &save_ptr);
-	while (token != NULL)
-	{
-		tokens[i] = strdup(token);
-		if (tokens[i] == NULL)
-		{
-			free(tokens);
-			free(copy);
-			return (NULL);
-		}
-		token = strtok_r(NULL, delim, &save_ptr);
 		i++;
 	}
-
-	tokens[i] = NULL;
-	free(copy);
-
-	return (tokens);
+	return (num_delm);
 }
 
+
+/**
+ * c_str_tok - tokenizes a string even the continuous delim with empty string
+ * (e.g. path --> ":/bin::/bin/usr" )
+ * @str: user's command typed into shell
+ * @delm: delimeter (e.g. " ");
+ * Return: an array of tokens (e.g. {"\0", "/bin", "\0", "/bin/usr"}
+ * (purpose is to have which command look through current directory if ":")
+ */
+char **c_str_tok(char *str, char *delm)
+{
+	int buffsize = 0, p = 0, si = 0, i = 0, len = 0, se = 0;
+	char **toks = NULL, d_ch;
+
+	/* set variable to be delimeter character (" ") */
+	d_ch = delm[0];
+	/* malloc number of ptrs to store array of tokens, and NULL ptr */
+	buffsize = c_t_size(str, d_ch);
+	toks = malloc(sizeof(char *) * (buffsize + 2));
+	if (toks == NULL)
+		return (NULL);
+
+	/* iterate from string index 0 to string ending index */
+	while (str[se] != '\0')
+		se++;
+	while (si < se)
+	{
+		/* malloc lengths for each token ptr in array */
+		len = t_strlen(str, si, d_ch);
+		toks[p] = malloc(sizeof(char) * (len + 1));
+		if (toks[p] == NULL)
+			return (NULL);
+		i = 0;
+		while ((str[si] != d_ch) &&
+		       (str[si] != '\0'))
+		{
+			toks[p][i] = str[si];
+			i++;
+			si++;
+		}
+		toks[p][i] = '\0'; /* null terminate at end*/
+		p++;
+		si++;
+	}
+	toks[p] = NULL; /* set last array ptr to NULL */
+	return (toks);
+}
