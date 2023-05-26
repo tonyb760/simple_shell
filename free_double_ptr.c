@@ -1,16 +1,17 @@
 #include "shell.h"
 
 /**
-* free_double_ptr - free malloced arrays
-* @str: array of strings
-*/
+ * free_double_ptr - free malloced arrays
+ * @str: array of strings
+ */
 void free_double_ptr(char **str)
 {
-int i;
+	int i = 0;
 
-for (i = 0; str[i] != NULL; i++)
-{
-free(str[i]);
-}
-free(str);
+	while (str[i] != NULL)
+	{
+		free(str[i]);
+		i++;
+	}
+	free(str);
 }
